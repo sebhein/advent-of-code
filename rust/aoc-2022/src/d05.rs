@@ -32,7 +32,7 @@ fn part_1(which_input: &String) {
             let row_chars: Vec<char> = _crate.chars().collect();
             if row_chars[1] == '1' { break; }
             for i in 0..MAGIC {
-                let c = row_chars[3 * i + 1 + i];
+                let c = row_chars[4 * i + 1];
                 if c == ' ' { continue; }
                 yard[i].push_front(c);
             }
@@ -71,7 +71,7 @@ fn part_2(which_input: &String) {
             let row_chars: Vec<char> = _crate.chars().collect();
             if row_chars[1] == '1' { break; }
             for i in 0..MAGIC {
-                let c = row_chars[3 * i + 1 + i];
+                let c = row_chars[4 * i + 1];
                 if c == ' ' { continue; }
                 yard[i].push_front(c);
             }
