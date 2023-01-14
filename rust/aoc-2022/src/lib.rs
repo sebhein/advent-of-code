@@ -1,6 +1,7 @@
 use std::fs;
 use std::error::Error;
 mod d06;
+mod d07;
 
 
 fn not_a_day(_input: &String) {
@@ -31,6 +32,7 @@ impl Day{
 
         let solve = match (*day).as_str() {
             "06" => d06::solve_06,
+            "07" => d07::solve_07,
             _ => not_a_day,
         };
 
