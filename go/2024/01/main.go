@@ -4,18 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
-	"strconv"
 	"sort"
+	"strconv"
+	"strings"
 )
 
 func main() {
-	partOne()
-	partTwo()
-}
-
-
-func partOne() {
 	readFile, err := os.Open("input.txt")
 	defer readFile.Close()
 
@@ -28,13 +22,13 @@ func partOne() {
 	var left, right []int
 	for fileScanner.Scan() {
 		line := strings.Fields(fileScanner.Text())
-		l, err := strconv.Atoi(line[0]);
+		l, err := strconv.Atoi(line[0])
 
 		if err != nil {
 			fmt.Println("not an integer")
 		}
 
-		r, err := strconv.Atoi(line[1]);
+		r, err := strconv.Atoi(line[1])
 		if err != nil {
 			fmt.Println("not an integer")
 		}
@@ -42,7 +36,11 @@ func partOne() {
 		left = append(left, l)
 		right = append(right, r)
 	}
+	partOne(left, right)
+	partTwo(left, right)
+}
 
+func partOne(left, right []int) {
 	sort.Ints(left)
 	sort.Ints(right)
 
@@ -59,36 +57,8 @@ func partOne() {
 	fmt.Println("Answer to Day 1 Part 1: ", diffSum)
 }
 
-
-func partTwo() {
-	readFile, err := os.Open("input.txt")
-	defer readFile.Close()
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-
-	var left, right []int
-	for fileScanner.Scan() {
-		line := strings.Fields(fileScanner.Text())
-		l, err := strconv.Atoi(line[0]);
-
-		if err != nil {
-			fmt.Println("not an integer")
-		}
-
-		r, err := strconv.Atoi(line[1]);
-		if err != nil {
-			fmt.Println("not an integer")
-		}
-
-		left = append(left, l)
-		right = append(right, r)
-	}
-
-	count := make(map[int] int)
+func partTwo(left, right []int) {
+	count := make(map[int]int)
 	for i := 0; i < len(left); i++ {
 		val, ok := count[left[i]]
 		if ok {
