@@ -88,14 +88,26 @@ func partTwo() {
 		right = append(right, r)
 	}
 
-	sum := 0
+	count := make(map[int] int)
 	for i := 0; i < len(left); i++ {
-		inner := left[i]
-		for j := 0; j < len(right); j++ {
-			if inner == right[j] {
-				sum += inner
-			}
+		val, ok := count[left[i]]
+		if ok {
+			count[left[i]] = val + 1
+		} else {
+			count[left[i]] = 0
 		}
+	}
+
+	for i := 0; i < len(right); i++ {
+		val, ok := count[right[i]]
+		if ok {
+			count[right[i]] = val + 1
+		}
+	}
+
+	sum := 0
+	for k, v := range count {
+		sum += k * v
 	}
 
 	fmt.Println("Answer to Day 1 Part 2: ", sum)
