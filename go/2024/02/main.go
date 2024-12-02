@@ -137,17 +137,22 @@ func partTwo() {
 	for fileScanner.Scan() {
 		report := strings.Fields(fileScanner.Text())
 
-		// fmt.Println("REPORT ", report)
+		reportSlice := make([]string, len(report))
+		copy(reportSlice, report)
+		isSafe := checkSafe(reportSlice)
+		if isSafe {
+			safe += 1
+			continue
+		}
+
+		fmt.Println("REPORT ", report)
 		for idx := 0; idx < len(report); idx++ {
 			reportSlice := make([]string, len(report))
 			copy(reportSlice, report)
-			if idx > 0 {
-				reportSlice = append(reportSlice[:idx], reportSlice[idx + 1:]...)
-			}
-
-			// fmt.Println(idx, reportSlice)
+			reportSlice = append(reportSlice[:idx], reportSlice[idx + 1:]...)
 
 			isSafe := checkSafe(reportSlice)
+			// fmt.Println(idx, reportSlice, isSafe)
 			if isSafe {
 				safe += 1
 				break
