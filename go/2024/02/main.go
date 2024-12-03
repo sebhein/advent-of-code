@@ -145,7 +145,7 @@ func partTwo() {
 			continue
 		}
 
-		fmt.Println("REPORT ", report)
+		// fmt.Println("REPORT ", report)
 		for idx := 0; idx < len(report); idx++ {
 			reportSlice := make([]string, len(report))
 			copy(reportSlice, report)
