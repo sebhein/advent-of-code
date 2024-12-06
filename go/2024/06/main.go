@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 )
@@ -23,13 +24,11 @@ type MapLoc struct {
 	col int
 }
 
-
 type Direction struct {
 	Facing string
-	RowD int
-	ColD int
+	RowD   int
+	ColD   int
 }
-
 
 func (d *Direction) DoTurn() {
 	switch d.Facing {
@@ -82,7 +81,7 @@ func partOne(inputFile string) {
 	currentLoc := start
 	currentDir := Direction{"north", -1, 0}
 	var nextRow, nextCol int
-	for { 
+	for {
 		// fmt.Println("current ", currentLoc)
 		visited[currentLoc] += 1
 		nextRow = currentLoc.row + currentDir.RowD
@@ -106,21 +105,89 @@ func partOne(inputFile string) {
 	fmt.Println("Answer to Day 6 Part 1: ", len(visited))
 }
 
-func (d Direction) PeekTurn() [2]int {
-	switch d.Facing {
+func WhereDoIGo(direction string) [2]int {
+	switch direction {
 	case "north":
-		return [2]int{0, 1}
-	case "east":
-		return [2]int{1, 0}
-	case "south":
-		return [2]int{0, -1}
-	case "west":
 		return [2]int{-1, 0}
+	case "east":
+		return [2]int{0, 1}
+	case "south":
+		return [2]int{1, 0}
+	case "west":
+		return [2]int{0, -1}
 	default:
 		panic("unknown direction!")
 	}
 }
 
+func PrintMap(labMap [][]string, visited map[MapLoc][]string) {
+	for row := 0; row < len(labMap); row++ {
+		for col := 0; col < len(labMap[0]); col++ {
+			curr, ok := visited[MapLoc{row, col}]
+			if !ok {
+				fmt.Printf(labMap[row][col])
+				fmt.Printf(" ")
+				continue
+			}
+
+			var horizontal, vertical bool
+			if slices.Contains(curr, "east") || slices.Contains(curr, "west") {
+				horizontal = true
+			}
+			if slices.Contains(curr, "south") || slices.Contains(curr, "north") {
+				vertical = true
+			}
+
+			if horizontal && vertical {
+				fmt.Printf("+ ")
+			} else if horizontal {
+				fmt.Printf("- ")
+			} else {
+				fmt.Printf("| ")
+			}
+		}
+		fmt.Printf("\n")
+	}
+}
+
+func tracePath(labMap [][]string, startingPosition MapLoc, startingDirection Direction, visited map[MapLoc][]string) bool {
+	currentLoc := startingPosition
+	currentDir := startingDirection
+	var nextRow, nextCol int
+	for {
+		// fmt.Println("current ", currentLoc)
+		directions, ok := visited[currentLoc]
+		if ok {
+			if slices.Contains(directions, currentDir.Facing) {
+				return true
+			}
+		}
+
+		visited[currentLoc] = append(visited[currentLoc], currentDir.Facing)
+
+		nextRow = currentLoc.row + currentDir.RowD
+		nextCol = currentLoc.col + currentDir.ColD
+		if nextRow < 0 || nextRow >= len(labMap) || nextCol < 0 || nextCol >= len(labMap[0]) {
+			// fmt.Println("left map")
+			break
+		}
+
+		// fmt.Println("item ", labMap[nextRow][nextCol])
+		for {
+			if labMap[nextRow][nextCol] == "#" || labMap[nextRow][nextCol] == "O" {
+				currentDir.DoTurn()
+				visited[currentLoc] = append(visited[currentLoc], currentDir.Facing)
+				nextRow = currentLoc.row + currentDir.RowD
+				nextCol = currentLoc.col + currentDir.ColD
+			} else {
+				break
+			}
+		}
+
+		currentLoc = MapLoc{nextRow, nextCol}
+	}
+	return false
+}
 
 func partTwo(inputFile string) {
 	readFile, _ := os.Open(inputFile)
@@ -130,7 +197,7 @@ func partTwo(inputFile string) {
 
 	// parse input
 	fileScanner := bufio.NewScanner(readFile)
-	visited := make(map[MapLoc]int)
+	visited := make(map[MapLoc][]string)
 	row := 0
 	var start MapLoc
 	for fileScanner.Scan() {
@@ -147,40 +214,46 @@ func partTwo(inputFile string) {
 
 	// fmt.Println(labMap)
 
-	currentLoc := start
-	currentDir := Direction{"north", -1, 0}
-	var nextRow, nextCol int
-	loops := 0
-	for { 
-		// fmt.Println("current ", currentLoc)
-		visited[currentLoc] += 1
-		nextRow = currentLoc.row + currentDir.RowD
-		nextCol = currentLoc.col + currentDir.ColD
-		if nextRow < 0 || nextRow >= len(labMap) || nextCol < 0 || nextCol >= len(labMap[0]) {
-			// fmt.Println("left map")
-			break
-		}
+	cycles := make(map[MapLoc]int)
+	tracePath(labMap, start, Direction{"north", -1, 0}, visited)
 
-		// fmt.Println("item ", labMap[nextRow][nextCol])
-		if labMap[nextRow][nextCol] == "#" {
-			currentDir.DoTurn()
-			// fmt.Println("turned ", currentDir)
-			nextRow = currentLoc.row + currentDir.RowD
-			nextCol = currentLoc.col + currentDir.ColD
-		}
+	for location, directions := range visited {
+		for _, direction := range directions {
+			toPlace := WhereDoIGo(direction)
+			rPlace := location.row + toPlace[0]
+			cPlace := location.col + toPlace[1]
 
-		currentLoc = MapLoc{nextRow, nextCol}
-
-		_, ok := visited[currentLoc]
-		if ok {
-			peek := currentDir.PeekTurn()
-			_, ok := visited[MapLoc{peek[0], peek[1]}]
-			if ok {
-				loops += 1
+			if rPlace < 0 || rPlace >= len(labMap) || cPlace < 0 || cPlace >= len(labMap[0]) || labMap[rPlace][cPlace] == "#" {
+				continue
 			}
-		}
+			var labMapCopy [][]string
+			for r := 0; r < len(labMap); r++ {
+				var rowCopy []string
+				for c := 0; c < len(labMap[0]); c++ {
+					rowCopy = append(rowCopy, labMap[r][c])
+				}
+				labMapCopy = append(labMapCopy, rowCopy)
+			}
 
+			// fmt.Println("placing @ ", rPlace, cPlace)
+
+			labMapCopy[rPlace][cPlace] = "O"
+			newVisited := make(map[MapLoc][]string)
+			// PrintMap(labMapCopy, newVisited)
+			// fmt.Println("->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->")
+			cycle := tracePath(labMapCopy, start, Direction{"north", -1, 0}, newVisited)
+			if cycle {
+				cycles[MapLoc{rPlace, cPlace}] += 1
+				// fmt.Println("found cycle!", MapLoc{rPlace, cPlace})
+				// PrintMap(labMapCopy, newVisited)
+			}
+			// fmt.Println("=========================================================================")
+		}
 	}
 
-	fmt.Println("Answer to Day 6 Part 2: ", loops)
+	// fmt.Println("cycles ", dupeVisits)
+
+	// PrintMap(labMap, visited)
+
+	fmt.Println("Answer to Day 6 Part 2: ", len(cycles))
 }
