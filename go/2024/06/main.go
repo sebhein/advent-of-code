@@ -223,7 +223,7 @@ func partTwo(inputFile string) {
 			rPlace := location.row + toPlace[0]
 			cPlace := location.col + toPlace[1]
 
-			if rPlace < 0 || rPlace >= len(labMap) || cPlace < 0 || cPlace >= len(labMap[0]) || labMap[rPlace][cPlace] == "#" {
+			if rPlace < 0 || rPlace >= len(labMap) || cPlace < 0 || cPlace >= len(labMap[0]) || labMap[rPlace][cPlace] == "#" || (rPlace == start.row && cPlace == start.col) {
 				continue
 			}
 			var labMapCopy [][]string
@@ -245,13 +245,16 @@ func partTwo(inputFile string) {
 			if cycle {
 				cycles[MapLoc{rPlace, cPlace}] += 1
 				// fmt.Println("found cycle!", MapLoc{rPlace, cPlace})
-				// PrintMap(labMapCopy, newVisited)
 			}
+			// PrintMap(labMapCopy, newVisited)
 			// fmt.Println("=========================================================================")
 		}
 	}
 
-	// fmt.Println("cycles ", dupeVisits)
+	_, ok := cycles[start]
+	fmt.Println("start in cycle loc ", ok)
+
+	// fmt.Println("cycles ", cycles)
 
 	// PrintMap(labMap, visited)
 
