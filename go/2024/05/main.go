@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
-	"slices"
 	"time"
 )
 
@@ -60,13 +60,12 @@ func partOne(inputFile string) {
 			}
 		}
 		if ordered {
-			sum += update[(len(update) - 1) / 2]
+			sum += update[(len(update)-1)/2]
 		}
 	}
 
 	fmt.Println("Answer to Day 5 Part 1: ", sum)
 }
-
 
 func partTwo(inputFile string) {
 	readFile, _ := os.Open(inputFile)
@@ -93,7 +92,6 @@ func partTwo(inputFile string) {
 		}
 	}
 
-	sum := 0
 	var unordered [][]int
 	for _, update := range updates {
 		ordered := true
@@ -113,18 +111,16 @@ func partTwo(inputFile string) {
 		}
 	}
 
+	sum := 0
 	for _, bad := range unordered {
-		correct := []int{}
-		copy(correct, bad)
-		for revIdx := len(bad) - 1; revIdx >= 0; revIdx-- {
-			current := bad[revIdx]
-			newIdx := revIdx
-			for searchIdx := revIdx - 1; searchIdx >= 0; searchIdx -- {
-				if slices.Contains(allOrdering[bad[searchIdx]], current) {
-					newIdx = searchIdx - 1
-				}
+		slices.SortFunc(bad, func(a, b int) int {
+			shouldComeBefore := slices.Contains(allOrdering[a], b)
+			if shouldComeBefore {
+				return -1
 			}
-		}
+			return 1
+		})
+		sum += bad[(len(bad)-1)/2]
 	}
 
 	fmt.Println("Answer to Day 5 Part 1: ", sum)
