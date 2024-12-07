@@ -129,27 +129,20 @@ func check(target int, vals []int) bool {
 		return checkVal == target
 	}
 
-	for _, op := range []string{"add", "mult", "concat"} {
-		var newTarget int
-		switch op {
-		case "add":
-			if target-checkVal < 0 {
-				continue
-			}
-			newTarget = target - checkVal
-		case "mult":
-			if target%checkVal != 0 {
-				continue
-			}
-			newTarget = target / checkVal
-		case "concat":
-			mod := target % powerOfTen(checkVal)
-			if mod != checkVal {
-				continue
-			}
-			newTarget = target / powerOfTen(checkVal)
+	if target-checkVal > 0 {
+		if check(target-checkVal, rest) {
+			return true
 		}
-		if check(newTarget, rest) {
+	}
+
+	if target%checkVal == 0 {
+		if check(target/checkVal, rest) {
+			return true
+		}
+	}
+
+	if target%powerOfTen(checkVal) == checkVal {
+		if check(target/powerOfTen(checkVal), rest) {
 			return true
 		}
 	}
