@@ -20,7 +20,6 @@ func main() {
 	fmt.Println("Solved Part 2 in: ", time.Since(start))
 }
 
-
 func partOne(inputFile string) {
 	readFile, _ := os.Open(inputFile)
 	defer readFile.Close()
@@ -66,9 +65,9 @@ func calibrateEquation(target int, opValues []int, resultChan chan<- int, wg *sy
 		calculated := opValues[0]
 		for j := 0; j < numOperators; j++ {
 			if (i & (1 << j)) != 0 {
-				calculated += opValues[j + 1]
+				calculated += opValues[j+1]
 			} else {
-				calculated *= opValues[j + 1]
+				calculated *= opValues[j+1]
 			}
 			if calculated > target {
 				break
@@ -97,7 +96,7 @@ func partTwo(inputFile string) {
 		targetAndValues := strings.Split(line, ":")
 		target, _ := strconv.Atoi(targetAndValues[0])
 		var values []int
-		for _, strNumber := range strings.Split(targetAndValues[1], " ") {
+		for _, strNumber := range strings.Split(strings.TrimSpace(targetAndValues[1]), " ") {
 			number, _ := strconv.Atoi(strNumber)
 			values = append(values, number)
 		}
@@ -110,39 +109,46 @@ func partTwo(inputFile string) {
 	fmt.Println("Answer to Day 7 Part 2: ", <-doneChan)
 }
 
+func check(target int, vals []int) bool {
+	checkVal := vals[len(vals)-1]
+	rest := vals[:len(vals)-1]
+	if len(rest) == 0 {
+		return checkVal == target
+	}
+
+	for _, op := range []string{"add", "mult", "concat"} {
+		var newTarget int
+		switch op {
+		case "add":
+			if target-checkVal < 0 {
+				continue
+			}
+			newTarget = target - checkVal
+		case "mult":
+			if target%checkVal != 0 {
+				continue
+			}
+			newTarget = target / checkVal
+		case "concat":
+			tarStr := strconv.Itoa(target)
+			checkStr := strconv.Itoa(checkVal)
+			if !strings.HasSuffix(tarStr, checkStr) {
+				continue
+			}
+			newTarget, _ = strconv.Atoi(tarStr[:len(tarStr)-len(checkStr)])
+		}
+		if check(newTarget, rest) {
+			return true
+		}
+	}
+
+	return false
+}
 
 func calibrateEquationConcatenation(target int, opValues []int, resultChan chan<- int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	numOperators := len(opValues) - 1
-	possibilities := 1
-	for i := 0; i < numOperators; i++ {
-		possibilities *= 3
-	}
-
-	for i := 0; i < possibilities; i++ {
-		current := i
-		calculated := opValues[0]
-		for j := 0; j < numOperators; j++ {
-			op := (current % 3) - 1
-			switch op {
-			case -1:
-				calculated += opValues[j + 1]
-			case 0:
-				calculated *= opValues[j + 1]
-			case 1:
-				concatedStr := strconv.Itoa(calculated) + strconv.Itoa(opValues[j + 1])
-				concatedInt, _ := strconv.Atoi(concatedStr)
-				calculated = concatedInt
-			}
-			current /= 3
-			if calculated > target {
-				break
-			}
-		}
-		if calculated == target {
-			resultChan <- target
-			return
-		}
+	if check(target, opValues) {
+		resultChan <- target
 	}
 }
