@@ -109,6 +109,19 @@ func partTwo(inputFile string) {
 	fmt.Println("Answer to Day 7 Part 2: ", <-doneChan)
 }
 
+func powerOfTen(num int) int {
+	if num < 10 {
+		return 10
+	} else if num < 100 {
+		return 100
+	} else if num < 1000 {
+		return 1000
+	} else if num < 10000 {
+		return 10000
+	}
+	return 0
+}
+
 func check(target int, vals []int) bool {
 	checkVal := vals[len(vals)-1]
 	rest := vals[:len(vals)-1]
@@ -130,12 +143,11 @@ func check(target int, vals []int) bool {
 			}
 			newTarget = target / checkVal
 		case "concat":
-			tarStr := strconv.Itoa(target)
-			checkStr := strconv.Itoa(checkVal)
-			if !strings.HasSuffix(tarStr, checkStr) {
+			mod := target % powerOfTen(checkVal)
+			if mod != checkVal {
 				continue
 			}
-			newTarget, _ = strconv.Atoi(tarStr[:len(tarStr)-len(checkStr)])
+			newTarget = target / powerOfTen(checkVal)
 		}
 		if check(newTarget, rest) {
 			return true
