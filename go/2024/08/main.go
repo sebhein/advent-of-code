@@ -104,12 +104,11 @@ func findAntinodes(locations []Coord, height, width int, resultChan chan<- []Coo
 	resultChan <- antinodes
 }
 
-func findResonantAntinodes(locations []Coord, height, width int, resultChan chan<- []Coord, wg *sync.WaitGroup) {
-	defer wg.Done()
-	if len(locations) <= 1 {
-		return
-	}
+func findResonantAntinodes(locations []Coord, height, width int) []Coord {
 	var antinodes []Coord
+	if len(locations) <= 1 {
+		return []Coord{}
+	}
 	for first := 0; first < len(locations)-1; first++ {
 		for second := first + 1; second < len(locations); second++ {
 			a := locations[first]
@@ -138,7 +137,7 @@ func findResonantAntinodes(locations []Coord, height, width int, resultChan chan
 			}
 		}
 	}
-	resultChan <- antinodes
+	return antinodes
 }
 
 func partTwo(inputFile string) {
@@ -163,19 +162,13 @@ func partTwo(inputFile string) {
 		height += 1
 	}
 
-	resultChan := make(chan []Coord)
-	doneChan := make(chan int)
-	var wg sync.WaitGroup
-
-	go countAntinodes(resultChan, doneChan)
-
+	foundAntinodes := make(map[Coord]int)
 	for _, coords := range antennas {
-		wg.Add(1)
-		go findResonantAntinodes(coords, height, width, resultChan, &wg)
+		found := findResonantAntinodes(coords, height, width)
+		for _, antinode := range found {
+			foundAntinodes[antinode] += 1
+		}
 	}
 
-	wg.Wait()
-	close(resultChan)
-
-	fmt.Println("Answer to Day 8 Part 2: ", <-doneChan)
+	fmt.Println("Answer to Day 8 Part 2: ", len(foundAntinodes))
 }
