@@ -42,14 +42,14 @@ func partOne(inputFile string) {
 				continue
 			}
 			length := countDigits(stone)
-			if length % 2 == 0 {
+			if length%2 == 0 {
 				half := length / 2
 				powerOfTen := int(math.Pow(float64(10), float64(half)))
-				nextArrangement = append(nextArrangement, stone / powerOfTen)
-				nextArrangement = append(nextArrangement, stone % powerOfTen)
+				nextArrangement = append(nextArrangement, stone/powerOfTen)
+				nextArrangement = append(nextArrangement, stone%powerOfTen)
 				continue
 			}
-			nextArrangement = append(nextArrangement, stone * 2024)
+			nextArrangement = append(nextArrangement, stone*2024)
 		}
 		stones = nextArrangement
 	}
@@ -65,7 +65,6 @@ func countDigits(number int) int {
 	}
 	return count
 }
-
 
 func partTwo(inputFile string) {
 	readFile, _ := os.Open(inputFile)
@@ -96,16 +95,16 @@ func partTwo(inputFile string) {
 				continue
 			}
 			length := countDigits(stone)
-			if length % 2 == 0 {
+			if length%2 == 0 {
 				half := length / 2
 				powerOfTen := int(math.Pow(float64(10), float64(half)))
 				cache[stone] = []int{stone / powerOfTen, stone % powerOfTen}
-				nextArrangement = append(nextArrangement, stone / powerOfTen)
-				nextArrangement = append(nextArrangement, stone % powerOfTen)
+				nextArrangement = append(nextArrangement, stone/powerOfTen)
+				nextArrangement = append(nextArrangement, stone%powerOfTen)
 				continue
 			}
-			cache[stone] = make([]int, stone * 2024)
-			nextArrangement = append(nextArrangement, stone * 2024)
+			cache[stone] = make([]int, stone*2024)
+			nextArrangement = append(nextArrangement, stone*2024)
 		}
 		stones = nextArrangement
 	}
@@ -127,15 +126,15 @@ func nextIteration(stone, currentIteration int) int {
 	}
 
 	if stone == 0 {
-		return nextIteration(1, currentIteration + 1)
+		return nextIteration(1, currentIteration+1)
 	}
 	length := countDigits(stone)
-	if length % 2 == 0 {
+	if length%2 == 0 {
 		half := length / 2
 		powerOfTen := int(math.Pow(float64(10), float64(half)))
-		num := nextIteration(stone / powerOfTen, currentIteration + 1)
-		return num + nextIteration(stone % powerOfTen, currentIteration + 1)
+		num := nextIteration(stone/powerOfTen, currentIteration+1)
+		return num + nextIteration(stone%powerOfTen, currentIteration+1)
 	}
 
-	return nextIteration(stone * 2024, currentIteration + 1)
+	return nextIteration(stone*2024, currentIteration+1)
 }
