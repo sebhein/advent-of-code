@@ -51,7 +51,7 @@ func partOne(inputFile string) {
 
 	var robots []robot
 	fileScanner := bufio.NewScanner(readFile)
-	for i := 1; fileScanner.Scan(); i++ {
+	for fileScanner.Scan() {
 		split := strings.Fields(fileScanner.Text())
 		pos := strings.Split(split[0][2:], ",")
 		vel := strings.Split(split[1][2:], ",")
