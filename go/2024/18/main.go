@@ -91,17 +91,37 @@ func partTwo(inputFile string, size, numFallen int) {
 	start := Position{0, 0}
 	end := Position{size - 1, size - 1}
 
+	var path []Position
 	fileScanner := bufio.NewScanner(readFile)
 	for bytesFallen := 0; fileScanner.Scan(); bytesFallen++ {
 		line := strings.Split(fileScanner.Text(), ",")
 		col, _ := strconv.Atoi(line[0])
 		row, _ := strconv.Atoi(line[1])
 		grid[row][col] = true
+		if bytesFallen == numFallen {
+			finalNode := aStar(grid, start, end)
+			current := finalNode
+			for current != nil {
+				path = append(path, current.pos)
+				current = current.parent
+			}
+		}
 		if bytesFallen > numFallen {
+			if !slices.Contains(path, Position{row, col}) {
+				continue
+			}
+
 			finalNode := aStar(grid, start, end)
 			if finalNode == nil {
 				fmt.Println("Answer to Day 18 Part 2: ", line)
 				return
+			}
+
+			path = make([]Position, 0)
+			current := finalNode
+			for current != nil {
+				path = append(path, current.pos)
+				current = current.parent
 			}
 		}
 	}
