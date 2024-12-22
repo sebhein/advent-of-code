@@ -19,7 +19,6 @@ func main() {
 	// fmt.Println("Solved Part 2 in: ", time.Since(start))
 }
 
-
 func partOne(inputFile string) {
 	readFile, _ := os.Open(inputFile)
 	defer readFile.Close()
@@ -49,7 +48,6 @@ func addSecrets(resultChan <-chan int, done chan<- int) {
 	done <- total
 }
 
-
 func calculateSecret(seed int, resultChan chan<- int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var result, secret int
@@ -63,7 +61,7 @@ func calculateSecret(seed int, resultChan chan<- int, wg *sync.WaitGroup) {
 
 		secret = result
 
-		result /=  32
+		result /= 32
 		result ^= secret
 		result %= 16777216
 

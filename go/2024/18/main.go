@@ -47,7 +47,6 @@ func partOne(inputFile string, size, numFallen int) {
 	start := Position{0, 0}
 	end := Position{size - 1, size - 1}
 
-
 	finalNode := aStar(grid, start, end)
 	current := finalNode
 	var path []Position
@@ -75,9 +74,8 @@ func partOne(inputFile string, size, numFallen int) {
 		}
 		fmt.Print("\n")
 	}
-	fmt.Println("Answer to Day 18 Part 1: ", len(path) - 1)
+	fmt.Println("Answer to Day 18 Part 1: ", len(path)-1)
 }
-
 
 func partTwo(inputFile string, size, numFallen int) {
 	readFile, _ := os.Open(inputFile)
